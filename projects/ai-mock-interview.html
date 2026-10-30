@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PM Interview Coach · Linh Tran</title>
+  <meta name="description" content="A Claude Skill that grades PM mock interview transcripts against format-specific rubrics and tracks named skills across sessions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-page="experiences" data-root="../">
+  <header id="site-header"></header>
+
+  <main class="container page">
+    <a class="back" href="../index.html">← All experiences</a>
+
+    <p class="eyebrow">Personal build • AI · Career</p>
+    <h1 class="cs-title">PM Interview Coach</h1>
+    <p class="cs-summary">A Claude Skill that grades PM mock interview transcripts and turns scattered practice into feedback that compounds.</p>
+
+    <!-- Cover image: replace the div's contents with <img src="../assets/img/projects/ai-mock-interview-cover.jpg" alt=""> -->
+    <div class="cs-cover" style="background:#E3F1EA">Cover image (16:9)</div>
+
+    <div class="cs-facts">
+      <div><p class="meta-label">Role</p><p>Solo builder: every product decision</p></div>
+      <div><p class="meta-label">Team</p><p>Just me, with Claude as implementation partner</p></div>
+      <div><p class="meta-label">Timeline</p><p>[Timeframe, e.g. Summer 2026]</p></div>
+      <div><p class="meta-label">Focus</p><p>AI Build, Product</p></div>
+    </div>
+
+    <!-- TL;DR: a few sentences (context, problem, your role, what you did) + up to 3 results.
+         Add class="num up" or "num down" for a green arrow; plain "num" for no arrow. -->
+    <div class="tldr">
+      <p class="tldr-label">TL;DR</p>
+      <p class="tldr-text">While prepping for PM interviews, I kept losing track of whether my mocks were improving anything. The feedback was scattered and never added up. I built a Claude Skill that grades transcripts against rubrics for five PM interview formats, returns a scored PDF report with the one highest-leverage fix, tracks named skills across sessions, and books a practice slot on my calendar.</p>
+      <div class="tldr-stats">
+        <div><p class="num">5</p><p class="what">PM interview formats, each with its own rubric</p></div>
+        <div><p class="num down">25x</p><p class="what">Tokens to read past sessions</p></div>
+        <div><p class="num">7</p><p class="what">Mock interviews graded so far</p></div>
+      </div>
+    </div>
+
+    <article class="cs-body read">
+      <section>
+        <h2>The problem</h2>
+        <p>PM interview prep generates a lot of feedback, but almost none of it compounds. Notes end up in a notebook or spreadsheet that gets updated inconsistently, so a week later there's no way to tell whether you're improving or running in place.</p>
+        <ul>
+          <li><strong>Feedback doesn't accumulate.</strong> Mocks happen regularly, but feedback is spread across notes, decks, and memory. Nothing shows the trajectory over time.</li>
+          <li><strong>Not all feedback is equally actionable.</strong> A reasoning gap (like weak user segmentation) and a habit (like pacing) get treated the same, so people fix whatever is most recent or memorable instead of what matters most.</li>
+          <li><strong>Generic feedback doesn't stick.</strong> "Be more structured" is true but not actionable. Feedback tied to a verbatim quote from your own answer is far more concrete.</li>
+          <li><strong>Practice and reflection are disconnected.</strong> Even good feedback is wasted if it doesn't turn into a specific thing to drill, with time actually booked to drill it.</li>
+        </ul>
+        <p>This mattered to me directly. I was prepping for PM interviews as part of my pivot into AI product management, and kept losing track of whether my mocks were working.</p>
+      </section>
+
+      <section>
+        <h2>What I built</h2>
+        <p>PM Interview Coach is a Claude Skill that grades mock interview transcripts against structured rubrics for five formats: Product Design, Product Strategy, Behavioral/Leadership, Estimation/Analytical, and Root Cause Analysis. It returns a scored PDF report covering what's working, what isn't, and the single highest-leverage thing to fix next, plus a trend line showing whether specific named skills are moving from session to session.</p>
+        <p>I owned every product decision: the grading logic, the report structure, what shipped in v1 versus what I deliberately scoped out, and when to trade completeness for reliability. I used Claude as the implementation partner to draft rubric criteria, generate the PDF (Python + reportlab), and flag technical constraints like token cost, rendering bugs, and connector limits for me to make the call on.</p>
+      </section>
+
+      <section>
+        <h2>Key product decisions</h2>
+        <p><strong>Architecture.</strong> I weighed building a website from scratch or a standalone HTML page against a Claude Skill. I chose the Skill because it's reusable and was the fastest to build.</p>
+        <p><strong>Format-specific rubrics.</strong> Each of the five interview types gets its own rubric, so answers are graded on dimensions that matter for that format instead of one generic rubric applied everywhere. I based them on reputable PM coaching resources and refined them with feedback from friends.</p>
+        <p><strong>A top-down report.</strong> The PDF has four sections, Performance Overview, Deep Dive, Feedback Progress, and Learning Plan, so users can see their performance from the big picture down to specifics.</p>
+        <p><strong>Scoping history to the 3 most recent sessions.</strong> The core value is the trend line: showing whether a named skill like "Quantify user impact" is moving over time. But re-reading every prior PDF doesn't scale. A full 5-page report costs about 2,500–3,500 tokens to read back, so 20 past sessions could cost 50,000–70,000 tokens before grading today's transcript. I scoped extraction to only each report's Feedback Progress Tracker section (about 100–150 tokens, roughly a 25x reduction) and capped it at the 3 most recent sessions per interview type.</p>
+        <p class="callout">The "ideal" version, full history for every session, wasn't the right version once cost was priced in. The constraint led to a better-scoped feature, not a worse one.</p>
+        <p><strong>A one-off calendar hold, not a recurring one.</strong> I first explored a recurring practice slot that would update with each new Learning Plan. Working through the edge cases (no memory of the event across conversations, finding it again by title, the user deleting or moving it, re-confirming every silent update) showed it added real failure surface for v1. I scoped it down to a single hold offered after each report: check availability, propose a slot, confirm, and create the event. There's no state to track between sessions. The recurring version is future work I chose not to build until the core product was solid.</p>
+      </section>
+
+      <section>
+        <h2>How I worked with Claude</h2>
+        <p><strong>Keeping content and formatting separate.</strong> As the report grew, I split grading and content rules into <code>SKILL.md</code> and visual and spacing rules into <code>pdf-layout.md</code>. A request like "add more space under this header" became a low-risk, one-file edit that couldn't touch grading logic.</p>
+        <p><strong>Evaluating the output.</strong></p>
+        <ul>
+          <li><strong>Accuracy:</strong> I checked Claude's claims against the transcript. If it said "you generated 3 solutions," I confirmed the transcript really had 3.</li>
+          <li><strong>Consistency:</strong> I graded the same transcript 3 times to check that the score, the feedback, and the output stayed the same.</li>
+          <li><strong>Formatting:</strong> I read the layout code, not just the rendered PDF. I caught a draw-order bug where an opaque section banner was silently painting over a paler content box. It was invisible in a visual scan and only catchable by tracing the coordinate math. Instead of patching that one spot, I had the fix written as a rule in the layout spec: never advance the y-position by a hardcoded offset, always compute it from the rendered height of the element above, and verify by tracing numbers rather than eyeballing the output. That rule prevents the same class of bug across the whole report.</li>
+        </ul>
+        <p><strong>Handling hallucinations.</strong></p>
+        <ul>
+          <li><strong>Correctness over completeness.</strong> When a rubric dimension like Success Metrics was never addressed (because I ran out of time), Claude would invent a plausible quote to fill the section. I made it say "not addressed: ran out of time" instead. Feedback has to be trustworthy, not artificially complete.</li>
+          <li><strong>Detect, then confirm.</strong> Claude initially inferred the interview type silently, and once graded a Product Strategy interview as Product Design. Rather than always asking, which is slow and often redundant, I had it infer the type, explain its reasoning, and confirm before grading, skipping the question when the user has already said it. Users don't answer questions the transcript already answers, but nothing is graded against a guessed rubric.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Features and why they exist</h2>
+        <ul>
+          <li><strong>Cross-session tracking.</strong> Named, reusable skills are tracked across the 3 most recent sessions per interview type, for example "Structure answers with frameworks: Session 1: 3/10 → Session 2: 6/10." It shows performance over time, not just one session.</li>
+          <li><strong>Closing the loop.</strong> With the Google Calendar connector, Claude proposes a one-off practice session targeting your weakest area, confirms a time, and creates the event with the reasoning and practice suggestions in the description. A static report becomes a scheduled next action.</li>
+          <li><strong>Slot-finding fallback.</strong> If nothing is free in your requested window, it proposes the closest available slot instead of dead-ending. You're never left with "no option" as an answer.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>The final product</h2>
+        <ol>
+          <li>You share a mock interview transcript (PDF, <code>.txt</code>, or pasted text). Claude infers the interview type and confirms before scoring.</li>
+          <li>Claude generates a four-section PDF report:
+            <ul>
+              <li><strong>Performance Overview:</strong> overall score, summary, what's working, and what needs improvement.</li>
+              <li><strong>Deep Dive:</strong> the 2–3 lowest-scoring dimensions, each with a verbatim quote, a concrete fix, and a stronger example answer.</li>
+              <li><strong>Feedback Progress Tracker:</strong> named skills scored for that session.</li>
+              <li><strong>Learning Plan:</strong> the single most impactful next focus, with practice suggestions and an effort-vs-impact estimate.</li>
+            </ul>
+          </li>
+          <li>Feedback compounds: later reports show trend lines on named skills, not just a fresh score.</li>
+          <li>If Google Calendar is connected, Claude offers to book a one-off practice session on your weakest area.</li>
+        </ol>
+        <!-- Screenshots: add sample report images here (Performance Overview, Deep Dive, Feedback Progress Tracker, Learning Plan, calendar hold) -->
+      </section>
+
+      <section>
+        <h2>Results</h2>
+        <p>I've run 7 of my own mock interviews through it so far and I'm still using it. Across those sessions, my performance has been improving.</p>
+      </section>
+
+      <section>
+        <h2>Next steps</h2>
+        <ul>
+          <li>Reduce token use and grading time.</li>
+          <li>Put it in front of more users to test.</li>
+        </ul>
+      </section>
+    </article>
+
+    <div class="next-project">
+      <a href="engageai.html">
+        <p class="meta">Next project →</p>
+        <h3>[placeholder]</h3>
+      </a>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>
